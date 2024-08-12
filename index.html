@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        /* styles.css */
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #87ceeb; /* Langit biru */
+}
+
+.game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background-color: #f0f0f0; /* Latar belakang permainan */
+}
+
+.player {
+    position: absolute;
+    bottom: 20px;
+    width: 60px;
+    height: 30px;
+    background-color: #ff4500; /* Warna karakter */
+    border-radius: 5px;
+}
+
+.object {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-color: #ffd700; /* Warna objek jatuh */
+    border-radius: 50%;
+}
+
+#score {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Menangkap Objek</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <div id="player" class="player"></div>
+        <div id="object" class="object"></div>
+        <div id="score">Skor: 0</div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        // script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const player = document.getElementById('player');
+    const object = document.getElementById('object');
+    const scoreElement = document.getElementById('score');
+    
+    let score = 0;
+    let playerX = window.innerWidth / 2 - 30; // Posisi awal karakter di tengah
+    let objectX = Math.random() * (window.innerWidth - 30);
+    let objectY = 0;
+    const playerWidth = player.offsetWidth;
+    const playerHeight = player.offsetHeight;
+    const objectWidth = object.offsetWidth;
+    const objectHeight = object.offsetHeight;
+    
+    function updateScore() {
+        scoreElement.textContent = `Skor: ${score}`;
+    }
+
+    function movePlayer(event) {
+        const key = event.key;
+        if (key === 'ArrowLeft') {
+            playerX -= 15;
+            if (playerX < 0) playerX = 0;
+        } else if (key === 'ArrowRight') {
+            playerX += 15;
+            if (playerX > window.innerWidth - playerWidth) playerX = window.innerWidth - playerWidth;
+        }
+        player.style.left = `${playerX}px`;
+    }
+
+    function dropObject() {
+        objectY += 5;
+        if (objectY > window.innerHeight) {
+            objectY = 0;
+            objectX = Math.random() * (window.innerWidth - objectWidth);
+            object.style.left = `${objectX}px`;
+        }
+        object.style.top = `${objectY}px`;
+    }
+
+    function checkCollision() {
+        const playerRect = player.getBoundingClientRect();
+        const objectRect = object.getBoundingClientRect();
+        if (
+            playerRect.left < objectRect.right &&
+            playerRect.right > objectRect.left &&
+            playerRect.top < objectRect.bottom &&
+            playerRect.bottom > objectRect.top
+        ) {
+            score += 10;
+            objectY = 0;
+            objectX = Math.random() * (window.innerWidth - objectWidth);
+            object.style.left = `${objectX}px`;
+            updateScore();
+        }
+    }
+
+    document.addEventListener('keydown', movePlayer);
+
+    setInterval(() => {
+        dropObject();
+        checkCollision();
+    }, 20); // Update game state every 20ms
+});
+
+    </script>
+</body>
+</html>
